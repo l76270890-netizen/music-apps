@@ -1,0 +1,37 @@
+{
+  "expo": {
+    "name": "TuneIt",
+    "slug": "tuneit-music-app",
+    "scheme": "tuneit",
+    "plugins": [
+      "expo-router",
+      "expo-status-bar",
+      [
+        "expo-audio",
+        {
+          "enableBackgroundPlayback": true,
+          "enableBackgroundRecording": false,
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
+      "expo-sqlite",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "TuneIt needs access to audio files on your device to build your music library.",
+          "granularPermissions": [
+            "audio"
+          ]
+        }
+      ],
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}

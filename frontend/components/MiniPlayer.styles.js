@@ -1,0 +1,4 @@
+import { StyleSheet } from 'react-native';
+import { colors } from '../constants/colors';
+
+export default StyleSheet.create({ wrap: { minHeight: 70, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, gap: 13, backgroundColor: colors.panel, borderTopWidth: 1, borderColor: colors.line, position: 'relative' }, progress: { position: 'absolute', top: -1, left: 0, height: 2, backgroundColor: colors.accent }, track: { flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'center', gap: 10 }, cover: { width: 42, height: 42, borderRadius: 7 }, fallback: { alignItems: 'center', justifyContent: 'center' }, glyph: { color: colors.text, fontSize: 20 }, copy: { flex: 1, minWidth: 0 }, title: { color: colors.text, fontSize: 12, fontWeight: '600' }, artist: { color: colors.muted, fontSize: 10, marginTop: 3 }, control: { width: 34, height: 40, alignItems: 'center', justifyContent: 'center' }, controlText: { color: colors.text, fontSize: 16, fontWeight: '700' } });

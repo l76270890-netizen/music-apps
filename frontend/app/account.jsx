@@ -66,7 +66,7 @@ export default function AccountScreen() {
           <TouchableOpacity disabled={busy || !configured} onPress={submit} style={[buttonStyle, (!configured || busy) && { opacity: 0.5 }]}>{busy ? <ActivityIndicator color="white" /> : <Text style={{ color: 'white', fontWeight: '700' }}>{mode === 'register' ? 'Create account' : 'Sign in'}</Text>}</TouchableOpacity>
           <TouchableOpacity onPress={() => { setMode(mode === 'register' ? 'login' : 'register'); setMessage(''); }} style={{ marginTop: 18, alignItems: 'center' }}><Text style={{ color: colors.accent }}>{mode === 'register' ? 'Already have an account? Sign in' : 'New to TuneIt? Create an account'}</Text></TouchableOpacity>
         </View>}
-        {!!authError && !user && authStatus === 'error' && <Text style={{ color: '#9A5C18', marginTop: 16, lineHeight: 20 }}>{authError.includes('expired') ? authError : 'Could not reconnect to your account. Check that the API is running, then try signing in again. Your saved token has been kept.'}</Text>}
+        {!!authError && !user && authStatus === 'error' && <Text style={{ color: '#9A5C18', marginTop: 16, lineHeight: 20 }}>{authError}</Text>}
         {!!message && <Text accessibilityRole="alert" style={{ color: message.toLocaleLowerCase().includes('signed') ? '#287A50' : '#B54747', marginTop: 16, lineHeight: 20 }}>{message}</Text>}
       </ScrollView>
     </KeyboardAvoidingView>

@@ -1,4 +1,6 @@
-const API_BASE_URL = typeof process !== 'undefined' ? (process.env.EXPO_PUBLIC_API_URL || '') : '';
+const API_BASE_URL = typeof process !== 'undefined'
+  ? (process.env.EXPO_PUBLIC_API_URL || '').trim().replace(/\/+$/, '')
+  : '';
 let accessToken = null;
 
 export function setApiToken(token) { accessToken = token || null; }
@@ -19,11 +21,16 @@ export class ApiError extends Error {
 
 export async function request(path, options = {}) {
   if (!API_BASE_URL) throw new Error('Music API is not configured. Set EXPO_PUBLIC_API_URL to enable account and library sync.');
-  const url = `${API_BASE_URL.replace(/\/$/, '')}/${String(path).replace(/^\//, '')}`;
-  const response = await fetch(url, {
-    ...options,
-    headers: { Accept: 'application/json', ...(options.body ? { 'Content-Type': 'application/json' } : {}), ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}), ...options.headers },
-  });
+  const url = `${API_BASE_URL}/${String(path).replace(/^\//, '')}`;
+  let response;
+  try {
+    response = await fetch(url, {
+      ...options,
+      headers: { Accept: 'application/json', ...(options.body ? { 'Content-Type': 'application/json' } : {}), ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}), ...options.headers },
+    });
+  } catch {
+    throw new ApiError(`Can't reach the TuneIt API at ${API_BASE_URL}. Check that the backend is running, EXPO_PUBLIC_API_URL is correct, and CORS_ORIGINS includes this app's Render URL.`, 0);
+  }
   const contentType = response.headers.get('content-type') || '';
   const payload = contentType.includes('application/json') ? await response.json() : await response.text();
   if (!response.ok) throw new ApiError(`Music API request failed (${response.status})`, response.status, payload);

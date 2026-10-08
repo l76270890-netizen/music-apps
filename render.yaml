@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: tuneit-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build:web
+    staticPublishPath: dist
+    envVars:
+      - key: EXPO_PUBLIC_API_URL
+        sync: false
+    headers:
+      - path: /*
+        name: Cross-Origin-Embedder-Policy
+        value: credentialless
+      - path: /*
+        name: Cross-Origin-Opener-Policy
+        value: same-origin
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

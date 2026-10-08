@@ -14,7 +14,7 @@ from security import current_user, hash_password, make_access_token, verify_pass
 
 Base.metadata.create_all(bind=engine)
 app = FastAPI(title="TuneIt API", version="0.1.0", description="Account and music-library metadata API. Audio stays on the user's device.")
-origins = [origin.strip() for origin in os.getenv("CORS_ORIGINS", "http://localhost:8081,http://localhost:8082,http://localhost:19006").split(",") if origin.strip()]
+origins = [origin.strip().rstrip("/") for origin in os.getenv("CORS_ORIGINS", "http://localhost:8081,http://localhost:8082,http://localhost:19006").split(",") if origin.strip()]
 app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
 

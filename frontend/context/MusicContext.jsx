@@ -122,16 +122,19 @@ export function MusicProvider({ children }) {
     if (index >= 0) setQueue(tracks.slice(index + 1));
   }, [playTrack]);
 
-  const scanLocalMusic = useCallback(async () => {
+  const scanLocalMusic = useCallback(async ({ requestPermission = true } = {}) => {
     setLibraryStatus('scanning');
     setLibraryError('');
     try {
-      const result = await scanDeviceAudio();
+      const result = await scanDeviceAudio({ requestPermission });
       if (result.permission !== 'granted') {
+        setLocalTracks((items) => items.filter((track) => track.source !== 'media-library'));
         setLibraryStatus('permission-denied');
         setLibraryError(result.permission === 'unsupported'
           ? 'Automatic device scanning is available in the Android and iOS app. Use Add audio files on web.'
-          : 'Allow audio access to scan music stored on this device.');
+          : requestPermission
+            ? 'Allow audio access to scan music stored on this device.'
+            : 'Tap Scan device to grant TuneIt access to your music library.');
         return [];
       }
       setLocalTracks((items) => combineLocalTracks(items.filter((track) => track.source !== 'media-library'), result.tracks));

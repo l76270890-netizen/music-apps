@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  ScrollView, View, Text, TextInput, TouchableOpacity, Image, Modal, Pressable, Share,
+  ScrollView, View, Text, TextInput, TouchableOpacity, Image, Modal, Pressable, Share, Platform,
   useWindowDimensions, StatusBar, StyleSheet,
 } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -286,19 +286,20 @@ function SearchScreen() {
 
 function LocalMusicScreen() {
   const { localTracks, libraryStatus, libraryImporting, libraryError, scanLocalMusic, importLocalMusic, playTrackFromList, setMenu } = useMusic();
-  useEffect(() => { scanLocalMusic(); }, [scanLocalMusic]);
-  const statusLabel = libraryStatus === 'scanning' ? 'Scanning audio on this device…' : libraryImporting ? 'Adding selected audio…' : `${localTracks.length} songs on this device`;
+  const isWeb = Platform.OS === 'web';
+  useEffect(() => { if (!isWeb) scanLocalMusic({ requestPermission: false }); }, [isWeb, scanLocalMusic]);
+  const statusLabel = libraryStatus === 'scanning' ? 'Scanning audio on this device…' : libraryImporting ? 'Adding selected audio…' : `${localTracks.length} songs ${isWeb ? 'added' : 'on this device'}`;
   return <View>
     <View style={s.pageHeading}><View><Text style={s.pageTitle}>Local Music</Text><Text style={s.pageSub}>{statusLabel}</Text></View><Text style={s.downloadCount}>♫ {localTracks.length}</Text></View>
     <View style={s.playlistActions}>
-      <Button disabled={libraryStatus === 'scanning' || libraryImporting} onPress={scanLocalMusic} style={s.secondaryButton}>{libraryStatus === 'scanning' ? 'Scanning…' : '↻  Scan device'}</Button>
-      <Button disabled={libraryStatus === 'scanning' || libraryImporting} onPress={importLocalMusic}>{libraryImporting ? 'Adding…' : '＋  Add audio files'}</Button>
+      {!isWeb && <Button disabled={libraryStatus === 'scanning' || libraryImporting} onPress={scanLocalMusic} style={s.secondaryButton}>{libraryStatus === 'scanning' ? 'Scanning…' : '↻  Scan device'}</Button>}
+      <Button disabled={libraryStatus === 'scanning' || libraryImporting} onPress={importLocalMusic}>{libraryImporting ? 'Adding…' : isWeb ? '＋  Choose audio files' : '＋  Add audio files'}</Button>
     </View>
     {!!libraryError && <Text style={[s.pageSub, { marginBottom: 12 }]}>{libraryError}</Text>}
     {localTracks.map((item, index) => <TrackRow key={item.id} item={item} index={index} onPress={() => playTrackFromList(item, localTracks)} onMenu={(track) => setMenu({ type: 'track', track })} />)}
     {!localTracks.length && libraryStatus !== 'scanning' && <View style={s.scanScreen}>
       <View style={s.scanOrb}><Text style={s.scanMusic}>♫</Text><View style={s.orbit} /></View>
-      <Text style={[s.pageSub, { textAlign: 'center', maxWidth: 300 }]}>Scan this device or choose audio files to build your offline library. Your music stays on this device.</Text>
+      <Text style={[s.pageSub, { textAlign: 'center', maxWidth: 300 }]}>{isWeb ? 'Browsers only let TuneIt access music files you choose. Select audio files above to add them. Automatic library scanning is available in the installed Android or iOS app.' : 'Scan this device or choose audio files to build your offline library. Your music stays on this device.'}</Text>
     </View>}
   </View>;
 }

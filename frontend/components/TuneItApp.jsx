@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import {
-  SafeAreaView, ScrollView, View, Text, TextInput, TouchableOpacity, Image, Modal, Pressable, Share,
+  ScrollView, View, Text, TextInput, TouchableOpacity, Image, Modal, Pressable, Share,
   useWindowDimensions, StatusBar, StyleSheet,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../constants/colors';
 import { useMusic } from '../context/MusicContext';
 import MiniPlayer from './MiniPlayer';
@@ -50,11 +51,33 @@ function TrackRow({ item, index, onPress, trailing, onMenu }) {
 function NavItem({ icon, title, route, active, compact }) {
   const router = useRouter();
   return (
-    <TouchableOpacity accessibilityRole="button" accessibilityState={{ selected: Boolean(active) }} accessibilityLabel={title} onPress={() => router.push(route)} style={[compact ? s.bottomItem : s.navItem, active && (compact ? s.bottomItemActive : s.navItemActive)]}>
-      <Text style={[compact ? s.bottomIcon : s.navIcon, active && s.activeText]}>{icon}</Text>
+    <TouchableOpacity accessibilityRole={compact ? 'tab' : 'button'} accessibilityState={{ selected: Boolean(active) }} accessibilityLabel={title} activeOpacity={0.78} onPress={() => compact ? router.replace(route) : router.push(route)} style={[compact ? s.bottomItem : s.navItem, active && (compact ? s.bottomItemActive : s.navItemActive)]}>
+      {compact ? <View style={[s.bottomIconBox, active && s.bottomIconBoxActive]}><NavGlyph name={icon} active={active} /></View> : <Text style={[s.navIcon, active && s.activeText]}>{icon}</Text>}
       <Text style={[compact ? s.bottomLabel : s.navLabel, active && s.activeText]}>{title}</Text>
     </TouchableOpacity>
   );
+}
+
+function NavGlyph({ name, active }) {
+  const color = active ? colors.accent : '#707483';
+  const line = { backgroundColor: color };
+  const outline = { borderColor: color };
+  if (name === 'home') return <View style={s.glyphCanvas}>
+    <View style={[s.homeRoofLeft, line]} /><View style={[s.homeRoofRight, line]} />
+    <View style={[s.homeBody, outline]} /><View style={[s.homeDoor, outline]} />
+  </View>;
+  if (name === 'search') return <View style={s.glyphCanvas}>
+    <View style={[s.searchLens, outline]} /><View style={[s.searchHandle, line]} />
+  </View>;
+  if (name === 'library') return <View style={s.glyphCanvas}>
+    <View style={[s.libraryFrame, outline]}>
+      <View style={[s.libraryLine, line]} /><View style={[s.libraryLine, line]} /><View style={[s.libraryLine, line]} />
+    </View>
+  </View>;
+  return <View style={s.glyphCanvas}>
+    <View style={[s.downloadStem, line]} /><View style={[s.downloadArrowLeft, line]} /><View style={[s.downloadArrowRight, line]} />
+    <View style={[s.downloadTray, outline]} />
+  </View>;
 }
 
 function SideBar({ screen }) {
@@ -452,6 +475,7 @@ function compactSize() { return 110; }
 
 export default function TuneItApp({ screen = 'home', playlistId }) {
   const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const router = useRouter();
   const { searchQuery, setSearchQuery, setMenu, toast, playTrack } = useMusic();
   const compact = width < 760;
@@ -468,7 +492,7 @@ export default function TuneItApp({ screen = 'home', playlistId }) {
   else if (screen === 'search') content = <SearchScreen />;
   else content = <HomeScreen router={router} compact={compact} />;
   return (
-    <SafeAreaView style={s.safe}>
+    <SafeAreaView style={s.safe} edges={['top', 'left', 'right']}>
       <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
       {compact ? <>
         <View style={s.mobileHeader}>{screen === 'player' ? <TouchableOpacity accessibilityRole="button" onPress={() => router.canGoBack() ? router.back() : router.replace('/')} style={s.mobileBrand}><Text style={s.backIcon}>‹</Text><Text style={s.mobileNowTitle}>Now Playing</Text></TouchableOpacity> : <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/')} style={s.mobileBrand}><View style={s.brandIcon}><Text style={s.brandGlyph}>♫</Text></View><Text style={s.brandName}>TuneIt</Text></TouchableOpacity>}<TouchableOpacity accessibilityRole="button" accessibilityLabel="Account and sign in" onPress={() => router.push('/account')}><Text style={s.topIcon}>◉</Text></TouchableOpacity></View>
@@ -476,7 +500,15 @@ export default function TuneItApp({ screen = 'home', playlistId }) {
           {screen === 'local' && <View style={s.mobilePageTitle}><Text style={s.mobileTitle}>Local Music</Text></View>}
           {content}
         </ScrollView>
-        {screen === 'player' ? null : <><MiniPlayer /><View style={s.bottomNav}><NavItem compact icon="⌂" title="Home" route="/" active={screen === 'home'} /><NavItem compact icon="⌕" title="Search" route="/search" active={screen === 'search'} /><NavItem compact icon="▤" title="Library" route="/library" active={screen === 'library' || screen === 'playlist' || screen === 'favorites'} /><NavItem compact icon="♫" title="Offline" route="/downloads" active={screen === 'downloads'} /></View></>}
+        {screen === 'player' ? null : <View style={[s.mobileDock, { paddingBottom: Math.max(insets.bottom, 7) }]}>
+          <MiniPlayer />
+          <View accessibilityRole="tablist" style={s.bottomNav}>
+            <NavItem compact icon="home" title="Home" route="/" active={screen === 'home'} />
+            <NavItem compact icon="search" title="Search" route="/search" active={screen === 'search'} />
+            <NavItem compact icon="library" title="Library" route="/library" active={screen === 'library' || screen === 'playlist' || screen === 'playlists' || screen === 'favorites' || screen === 'local'} />
+            <NavItem compact icon="offline" title="Offline" route="/downloads" active={screen === 'downloads'} />
+          </View>
+        </View>}
       </> : <View style={s.desktopShell}>
         <SideBar screen={active} />
         <View style={s.mainColumn}><TopBar /><ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.mainContent}>{screen !== 'home' && <Text style={s.desktopTitle}>{titles[active] || 'TuneIt'}</Text>}{content}</ScrollView></View>
@@ -544,6 +576,16 @@ const s = StyleSheet.create({
   scanScreen: { alignItems: 'center', paddingTop: 50, paddingBottom: 30 }, scanOrb: { width: 135, height: 135, borderRadius: 70, borderWidth: 1, borderColor: '#E3DDF1', backgroundColor: '#F0ECF8', alignItems: 'center', justifyContent: 'center', marginBottom: 27 }, scanMusic: { color: colors.accent, fontSize: 47 }, orbit: { position: 'absolute', width: 105, height: 105, borderWidth: 2, borderColor: colors.accent, borderLeftColor: 'transparent', borderRadius: 55, transform: [{ rotate: '-35deg' }] }, scanChecks: { width: '100%', maxWidth: 380, backgroundColor: colors.card, paddingHorizontal: 16, paddingVertical: 7, borderRadius: 15, marginTop: 28 }, checkRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 13, borderBottomWidth: 1, borderColor: colors.line, gap: 10 }, check: { color: colors.accent, fontSize: 16 }, scanCheckLabel: { color: colors.text, fontSize: 11, flex: 1 }, scanCheckValue: { color: colors.muted, fontSize: 11 }, scanProgress: { width: '100%', maxWidth: 380, height: 8, backgroundColor: '#E5E6EC', borderRadius: 8, marginTop: 25, overflow: 'hidden' }, scanPercent: { color: colors.muted, fontSize: 10, alignSelf: 'flex-end', marginTop: 6 }, listCaption: { color: colors.muted, fontSize: 9, letterSpacing: 1.1, fontWeight: '700', marginTop: 15, marginBottom: 8 }, downloadButton: { width: 33, height: 33, borderRadius: 17, backgroundColor: '#F0ECFA', alignItems: 'center', justifyContent: 'center' }, downloadGlyph: { color: colors.accent, fontSize: 17 }, downloadCount: { color: colors.accent, backgroundColor: '#F0ECFA', borderRadius: 15, paddingHorizontal: 12, paddingVertical: 8, fontSize: 11 },
   playlistHero: { flexDirection: 'row', alignItems: 'flex-end', gap: 16, marginTop: 10, marginBottom: 4 }, playlistInfo: { flex: 1, paddingBottom: 6 }, playlistActions: { flexDirection: 'row', alignItems: 'center', gap: 9, marginVertical: 14 }, secondaryButton: { backgroundColor: '#F0F1F6', paddingHorizontal: 14 }, shufflePlaylistButton: { backgroundColor: '#F0ECFA' }, mobilePlaylistArtwork: { width: '100%', height: 300, borderRadius: 20, overflow: 'hidden', position: 'relative', backgroundColor: '#D8D2E4', marginTop: 8 }, mobilePlaylistFallback: { flex: 1, alignItems: 'center', justifyContent: 'center' }, mobilePlaylistGlyph: { color: 'rgba(255,255,255,0.9)', fontSize: 100, fontWeight: '800' }, mobilePlaylistShade: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, backgroundColor: 'rgba(18,18,26,0.32)' }, mobilePlaylistCopy: { position: 'absolute', left: 20, right: 20, bottom: 20 }, mobilePlaylistEyebrow: { color: '#F1ECFF', fontSize: 9, fontWeight: '800', letterSpacing: 1.3, marginBottom: 6 }, mobilePlaylistTitle: { color: '#FFFFFF', fontSize: 27, lineHeight: 32, fontWeight: '800' }, mobilePlaylistSub: { color: '#F5F3F8', fontSize: 11, marginTop: 5 },
   fullPlayer: { alignItems: 'center', padding: 10, maxWidth: 520, alignSelf: 'center', width: '100%' }, fullPlayerCompact: { paddingTop: 1, paddingHorizontal: 2 }, playerSource: { alignItems: 'center', marginBottom: 15 }, playerSourceEyebrow: { color: colors.muted, fontSize: 8, letterSpacing: 1.1, fontWeight: '700' }, playerSourceName: { color: colors.text, fontSize: 11, fontWeight: '700', marginTop: 3, maxWidth: 280 }, playerArtwork: { width: '100%', aspectRatio: 1, maxHeight: 440, borderRadius: 22, backgroundColor: '#E9E5F2', overflow: 'hidden', alignItems: 'center', justifyContent: 'center', position: 'relative' }, playerArtworkCompact: { maxHeight: 360, borderRadius: 20 }, playerArtworkFallback: { flex: 1, width: '100%', alignItems: 'center', justifyContent: 'center', backgroundColor: '#E9E5F2' }, playerOfflineStamp: { position: 'absolute', bottom: 15, color: '#777185', fontSize: 8, fontWeight: '800', letterSpacing: 1.5 }, playerSun: { position: 'absolute', width: '34%', aspectRatio: 1, top: '13%', borderRadius: 200, backgroundColor: '#F27B91', opacity: 0.88 }, playerPalm: { position: 'absolute', right: '13%', top: '2%', color: '#171322', fontSize: 120 }, playerSilhouette: { position: 'absolute', color: '#AAA2B8', fontSize: 145, bottom: 20 }, playerShoulders: { position: 'absolute', color: '#12121A', fontSize: 245, bottom: -102, transform: [{ rotate: '90deg' }] }, playerMeta: { width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 18 }, playerTrackInfo: { flex: 1, minWidth: 0, paddingRight: 15 }, playerTrackName: { textAlign: 'left', fontSize: 19, fontWeight: '800' }, playerTrackArtist: { textAlign: 'left', fontSize: 11 }, heart: { color: '#777987', fontSize: 26 }, bigPlay: { width: 60, height: 60, borderRadius: 31 }, playerExtras: { width: '100%', flexDirection: 'row', justifyContent: 'space-between', marginTop: 20, flexWrap: 'wrap', gap: 10 }, offlineListening: { width: '100%', flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 16, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: colors.line, paddingHorizontal: 14, paddingVertical: 12, marginTop: 20 }, offlineListeningIcon: { color: colors.accent, fontSize: 18 }, offlineListeningTitle: { color: colors.text, fontSize: 11, fontWeight: '700' }, offlineListeningSub: { color: colors.muted, fontSize: 9, marginTop: 3 }, offlineListeningCheck: { color: '#2A9B6F', fontSize: 16, fontWeight: '800' },
-  mobileHeader: { height: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 17 }, mobileBrand: { flexDirection: 'row', alignItems: 'center', gap: 9 }, mobileScroll: { flex: 1 }, mobileContent: { paddingHorizontal: 17, paddingTop: 8, paddingBottom: 30 }, mobilePageTitle: { marginBottom: 16 }, mobileTitle: { color: colors.text, fontSize: 21, fontWeight: '750' }, bottomNav: { height: 65, borderTopWidth: 1, borderColor: colors.line, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', backgroundColor: '#FFFFFF', paddingBottom: 4 }, bottomItem: { alignItems: 'center', justifyContent: 'center', minWidth: 58, paddingVertical: 3 }, bottomIcon: { color: colors.muted, fontSize: 19 }, bottomLabel: { color: colors.muted, fontSize: 9, marginTop: 3 }, bottomItemActive: { backgroundColor: 'transparent' },
+  mobileHeader: { height: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 17 }, mobileBrand: { flexDirection: 'row', alignItems: 'center', gap: 9 }, mobileScroll: { flex: 1 }, mobileContent: { paddingHorizontal: 17, paddingTop: 8, paddingBottom: 30 }, mobilePageTitle: { marginBottom: 16 }, mobileTitle: { color: colors.text, fontSize: 21, fontWeight: '750' },
+  mobileDock: { backgroundColor: '#FFFFFF', borderTopWidth: 1, borderTopColor: '#ECECF2', paddingTop: 5, shadowColor: '#241A42', shadowOpacity: 0.06, shadowRadius: 14, shadowOffset: { width: 0, height: -5 }, elevation: 8 },
+  bottomNav: { minHeight: 66, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', paddingHorizontal: 7 },
+  bottomItem: { flex: 1, minWidth: 0, minHeight: 58, alignItems: 'center', justifyContent: 'center', borderRadius: 14, paddingVertical: 3 }, bottomItemActive: { backgroundColor: 'transparent' },
+  bottomIconBox: { width: 48, height: 31, alignItems: 'center', justifyContent: 'center', borderRadius: 16 }, bottomIconBoxActive: { backgroundColor: '#F1EDFF' },
+  bottomLabel: { color: '#7B7F8D', fontSize: 10, fontWeight: '600', letterSpacing: 0.1, marginTop: 2 },
+  glyphCanvas: { width: 22, height: 22, position: 'relative', alignItems: 'center', justifyContent: 'center' },
+  homeRoofLeft: { position: 'absolute', width: 10, height: 2, left: 2, top: 6, borderRadius: 2, transform: [{ rotate: '-42deg' }] }, homeRoofRight: { position: 'absolute', width: 10, height: 2, right: 2, top: 6, borderRadius: 2, transform: [{ rotate: '42deg' }] }, homeBody: { position: 'absolute', width: 13, height: 10, left: 4.5, bottom: 1, borderWidth: 1.8, borderTopWidth: 0, borderBottomLeftRadius: 2, borderBottomRightRadius: 2 }, homeDoor: { position: 'absolute', width: 4, height: 6, bottom: 1, left: 9, borderWidth: 1.5, borderBottomWidth: 0, borderTopLeftRadius: 2, borderTopRightRadius: 2 },
+  searchLens: { position: 'absolute', width: 14, height: 14, left: 2, top: 2, borderWidth: 1.8, borderRadius: 8 }, searchHandle: { position: 'absolute', width: 8, height: 1.8, right: 0, bottom: 2, borderRadius: 2, transform: [{ rotate: '48deg' }] },
+  libraryFrame: { width: 15, height: 18, borderWidth: 1.7, borderRadius: 3, alignItems: 'center', justifyContent: 'center', gap: 3 }, libraryLine: { width: 8, height: 1.5, borderRadius: 1 },
+  downloadStem: { position: 'absolute', width: 1.8, height: 10, left: 10, top: 2, borderRadius: 1 }, downloadArrowLeft: { position: 'absolute', width: 6, height: 1.8, left: 5, top: 9, borderRadius: 1, transform: [{ rotate: '45deg' }] }, downloadArrowRight: { position: 'absolute', width: 6, height: 1.8, right: 5, top: 9, borderRadius: 1, transform: [{ rotate: '-45deg' }] }, downloadTray: { position: 'absolute', width: 15, height: 6, left: 3.5, bottom: 1, borderWidth: 1.6, borderTopWidth: 1.8, borderRadius: 2 },
   desktopTitle: { color: colors.text, fontSize: 23, fontWeight: '800', marginHorizontal: 4, marginBottom: 15 },
 });

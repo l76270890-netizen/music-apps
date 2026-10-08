@@ -33,9 +33,10 @@ function toTrack(asset, index) {
   };
 }
 
-export async function scanDeviceAudio() {
+export async function scanDeviceAudio({ requestPermission = true } = {}) {
   if (Platform.OS === 'web') return { tracks: [], permission: 'unsupported' };
-  const permission = await MediaLibrary.requestPermissionsAsync(false, ['audio']);
+  let permission = await MediaLibrary.getPermissionsAsync(false, ['audio']);
+  if (!permission.granted && requestPermission) permission = await MediaLibrary.requestPermissionsAsync(false, ['audio']);
   if (!permission.granted) return { tracks: [], permission: permission.status };
   const assets = [];
   let page;

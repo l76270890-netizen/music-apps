@@ -3,6 +3,9 @@
     "name": "TuneIt",
     "slug": "tuneit-music-app",
     "scheme": "tuneit",
+    "android": {
+      "package": "com.tuneit.musicapp"
+    },
     "plugins": [
       "expo-router",
       "expo-status-bar",

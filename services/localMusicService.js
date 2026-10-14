@@ -2,6 +2,7 @@ import { Platform } from 'react-native';
 import * as MediaLibrary from 'expo-media-library/legacy';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
+import { colors } from '../constants/colors';
 
 function titleFromFilename(filename = '') {
   return filename.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim() || 'Untitled track';
@@ -27,7 +28,7 @@ function toTrack(asset, index) {
     time: durationLabel(duration),
     audioUrl: asset.uri,
     localUri: asset.uri,
-    color: '#44305F',
+    color: colors.cardLight,
     art: '♫',
     source: asset.source || 'device',
   };

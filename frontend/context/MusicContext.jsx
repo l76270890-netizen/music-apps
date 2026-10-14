@@ -5,10 +5,11 @@ import { combineLocalTracks, pickAudioFiles, scanDeviceAudio } from '../services
 import * as auth from '../services/authService';
 import { metadataKey, syncLibraryState } from '../services/syncService';
 import Storage from '../services/storage';
+import { colors } from '../constants/colors';
 
 const MusicContext = createContext(null);
 const seedPlaylists = [
-  { id: 'liked-songs', name: 'Liked Songs', count: 0, color: '#824EFF', icon: '♥' },
+  { id: 'liked-songs', name: 'Liked Songs', count: 0, color: colors.accent, icon: '♥' },
 ];
 const legacyDemoPlaylistIds = new Set(['chill-vibes', 'workout', 'afrobeats', 'rock-classics']);
 
@@ -265,7 +266,7 @@ export function MusicProvider({ children }) {
       return false;
     }
     const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    setPlaylists((items) => [...items, { id, name: cleanName, count: initialTrack ? 1 : 0, color: '#7451BC', icon: '♫' }]);
+    setPlaylists((items) => [...items, { id, name: cleanName, count: initialTrack ? 1 : 0, color: colors.cardLight, icon: '♫' }]);
     if (initialTrack) setPlaylistTracks((items) => ({ ...items, [id]: [initialTrack] }));
     notify(initialTrack ? `Created “${cleanName}” and added ${initialTrack.title}` : `Created “${cleanName}”`);
     return id;
@@ -353,7 +354,7 @@ export function MusicProvider({ children }) {
       const localPlaylist = playlists.find((item) => item.name.toLocaleLowerCase() === remote.name.toLocaleLowerCase());
       const localId = localPlaylist?.id || `cloud-${remote.id}`;
       remotePlaylistTracks[localId] = (remote.songs || []).map((song) => tracksByKey.get(song.device_key)).filter(Boolean);
-      return { id: localId, remoteId: remote.id, name: remote.name, count: remotePlaylistTracks[localId].length, color: localPlaylist?.color || '#7451BC', icon: localPlaylist?.icon || '♫' };
+      return { id: localId, remoteId: remote.id, name: remote.name, count: remotePlaylistTracks[localId].length, color: localPlaylist?.color || colors.cardLight, icon: localPlaylist?.icon || '♫' };
     });
     setPlaylists((items) => {
       const remoteNames = new Set(cloudPlaylists.map((item) => item.name.toLocaleLowerCase()));

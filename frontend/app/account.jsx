@@ -46,7 +46,7 @@ export default function AccountScreen() {
     finally { setBusy(false); }
   };
 
-  const fieldStyle = { height: 48, marginTop: 12, paddingHorizontal: 14, borderRadius: 12, backgroundColor: '#FFFFFF', color: colors.text, borderWidth: 1, borderColor: colors.line };
+  const fieldStyle = { height: 48, marginTop: 12, paddingHorizontal: 14, borderRadius: 12, backgroundColor: colors.panel, color: colors.text, borderWidth: 1, borderColor: colors.line };
   const buttonStyle = { minHeight: 48, alignItems: 'center', justifyContent: 'center', borderRadius: 24, backgroundColor: colors.accent, marginTop: 16, paddingHorizontal: 18 };
   return <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -54,20 +54,20 @@ export default function AccountScreen() {
         <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={() => router.canGoBack() ? router.back() : router.replace('/')}><Text style={{ color: colors.accent, fontSize: 14 }}>‹  Back</Text></TouchableOpacity>
         <Text style={{ color: colors.text, fontSize: 28, fontWeight: '800', marginTop: 28 }}>TuneIt account</Text>
         <Text style={{ color: colors.muted, fontSize: 13, lineHeight: 20, marginTop: 8 }}>Your audio files stay on your device. Sign in to sync song details, favorites, and playlists.</Text>
-        {!configured && <View style={{ padding: 14, backgroundColor: '#F0ECFA', borderRadius: 12, marginTop: 20 }}><Text style={{ color: '#51466B', fontSize: 12, lineHeight: 18 }}>Sign in and sync are optional. Local music playback works offline. To sync favorites and playlists, set EXPO_PUBLIC_API_URL and restart Expo.</Text></View>}
-        {authStatus === 'loading' ? <View accessibilityRole="progressbar" style={{ marginTop: 30, alignItems: 'center', gap: 12 }}><ActivityIndicator color={colors.accentLight} /><Text style={{ color: colors.muted }}>Checking your account…</Text></View> : user ? <View style={{ marginTop: 24, padding: 18, borderRadius: 16, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: colors.line }}>
+        {!configured && <View style={{ padding: 14, backgroundColor: colors.panel, borderRadius: 12, marginTop: 20 }}><Text style={{ color: colors.text, fontSize: 12, lineHeight: 18 }}>Sign in and sync are optional. Local music playback works offline. To sync favorites and playlists, set EXPO_PUBLIC_API_URL and restart Expo.</Text></View>}
+        {authStatus === 'loading' ? <View accessibilityRole="progressbar" style={{ marginTop: 30, alignItems: 'center', gap: 12 }}><ActivityIndicator color={colors.accentLight} /><Text style={{ color: colors.muted }}>Checking your account…</Text></View> : user ? <View style={{ marginTop: 24, padding: 18, borderRadius: 16, backgroundColor: colors.panel, borderWidth: 1, borderColor: colors.line }}>
           <Text style={{ color: colors.text, fontSize: 17, fontWeight: '700' }}>{user.username}</Text><Text style={{ color: colors.muted, marginTop: 5 }}>{user.email}</Text>
-          <TouchableOpacity disabled={busy || !configured} onPress={sync} style={[buttonStyle, (!configured || busy) && { opacity: 0.5 }]}>{busy ? <ActivityIndicator color="white" /> : <Text style={{ color: 'white', fontWeight: '700' }}>Sync library and playlists</Text>}</TouchableOpacity>
+          <TouchableOpacity disabled={busy || !configured} onPress={sync} style={[buttonStyle, (!configured || busy) && { opacity: 0.5 }]}>{busy ? <ActivityIndicator color={colors.onAccent} /> : <Text style={{ color: colors.onAccent, fontWeight: '700' }}>Sync library and playlists</Text>}</TouchableOpacity>
           <TouchableOpacity disabled={busy} onPress={signOutAction} style={{ marginTop: 18, alignItems: 'center' }}><Text style={{ color: colors.accent }}>Sign out</Text></TouchableOpacity>
         </View> : <View style={{ marginTop: 20 }}>
           {mode === 'register' && <TextInput accessibilityLabel="Username" value={username} onChangeText={setUsername} placeholder="Username" placeholderTextColor={colors.muted} autoCapitalize="words" autoComplete="username-new" returnKeyType="next" onSubmitEditing={() => emailInput.current?.focus()} style={fieldStyle} />}
           <TextInput ref={emailInput} accessibilityLabel="Email" value={email} onChangeText={setEmail} placeholder="Email" placeholderTextColor={colors.muted} autoCapitalize="none" autoCorrect={false} autoComplete="email" keyboardType="email-address" returnKeyType="next" onSubmitEditing={() => passwordInput.current?.focus()} style={fieldStyle} />
           <TextInput ref={passwordInput} accessibilityLabel="Password" value={password} onChangeText={setPassword} placeholder={mode === 'register' ? 'Password (8 characters minimum)' : 'Password'} placeholderTextColor={colors.muted} autoCapitalize="none" autoComplete={mode === 'register' ? 'new-password' : 'current-password'} secureTextEntry returnKeyType="done" onSubmitEditing={submit} style={fieldStyle} />
-          <TouchableOpacity disabled={busy || !configured} onPress={submit} style={[buttonStyle, (!configured || busy) && { opacity: 0.5 }]}>{busy ? <ActivityIndicator color="white" /> : <Text style={{ color: 'white', fontWeight: '700' }}>{mode === 'register' ? 'Create account' : 'Sign in'}</Text>}</TouchableOpacity>
+          <TouchableOpacity disabled={busy || !configured} onPress={submit} style={[buttonStyle, (!configured || busy) && { opacity: 0.5 }]}>{busy ? <ActivityIndicator color={colors.onAccent} /> : <Text style={{ color: colors.onAccent, fontWeight: '700' }}>{mode === 'register' ? 'Create account' : 'Sign in'}</Text>}</TouchableOpacity>
           <TouchableOpacity onPress={() => { setMode(mode === 'register' ? 'login' : 'register'); setMessage(''); }} style={{ marginTop: 18, alignItems: 'center' }}><Text style={{ color: colors.accent }}>{mode === 'register' ? 'Already have an account? Sign in' : 'New to TuneIt? Create an account'}</Text></TouchableOpacity>
         </View>}
-        {!!authError && !user && authStatus === 'error' && <Text style={{ color: '#9A5C18', marginTop: 16, lineHeight: 20 }}>{authError}</Text>}
-        {!!message && <Text accessibilityRole="alert" style={{ color: message.toLocaleLowerCase().includes('signed') ? '#287A50' : '#B54747', marginTop: 16, lineHeight: 20 }}>{message}</Text>}
+        {!!authError && !user && authStatus === 'error' && <Text style={{ color: colors.accent, marginTop: 16, lineHeight: 20 }}>{authError}</Text>}
+        {!!message && <Text accessibilityRole="alert" style={{ color: message.toLocaleLowerCase().includes('signed') ? colors.accentLight : colors.accent, marginTop: 16, lineHeight: 20 }}>{message}</Text>}
       </ScrollView>
     </KeyboardAvoidingView>
   </SafeAreaView>;

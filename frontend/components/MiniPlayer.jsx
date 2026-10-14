@@ -2,6 +2,7 @@ import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useMusic } from '../context/MusicContext';
+import { colors } from '../constants/colors';
 import styles from './MiniPlayer.styles';
 
 export default function MiniPlayer() {
@@ -12,7 +13,7 @@ export default function MiniPlayer() {
   return <View style={styles.wrap}>
     <View style={[styles.progress, { width: `${progress * 100}%` }]} />
     <Pressable accessibilityRole="button" onPress={() => router.push('/player/current')} style={styles.track}>
-      {currentTrack.artwork ? <Image source={{ uri: currentTrack.artwork }} style={styles.cover} /> : <View style={[styles.cover, styles.fallback, { backgroundColor: currentTrack.color || '#393044' }]}><Text style={styles.glyph}>{currentTrack.art || '♫'}</Text></View>}
+      {currentTrack.artwork ? <Image source={{ uri: currentTrack.artwork }} style={styles.cover} /> : <View style={[styles.cover, styles.fallback, { backgroundColor: currentTrack.color || colors.cardLight }]}><Text style={styles.glyph}>{currentTrack.art || '♫'}</Text></View>}
       <View style={styles.copy}><Text numberOfLines={1} style={styles.title}>{currentTrack.title}</Text><Text numberOfLines={1} style={styles.artist}>{currentTrack.artist}</Text></View>
     </Pressable>
     <Pressable accessibilityRole="button" accessibilityLabel={playerStatus?.playing ? 'Pause' : 'Play'} onPress={togglePlay} style={styles.control}><Text style={styles.controlText}>{playerStatus?.playing ? 'Ⅱ' : '▶'}</Text></Pressable>

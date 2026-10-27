@@ -6,7 +6,7 @@ import { colors } from '../constants/colors';
 export default function WelcomeScreen({ onGetStarted }) {
   return (
     <SafeAreaView style={styles.safe}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
       <View style={styles.screen}>
         <View style={styles.brandRow}>
           <View style={styles.brandIcon}><Text style={styles.brandNote}>♫</Text></View>

@@ -5,10 +5,11 @@ import { combineLocalTracks, pickAudioFiles, scanDeviceAudio } from '../services
 import * as auth from '../services/authService';
 import { metadataKey, syncLibraryState } from '../services/syncService';
 import Storage from '../services/storage';
+import { colors } from '../constants/colors';
 
 const MusicContext = createContext(null);
 const seedPlaylists = [
-  { id: 'liked-songs', name: 'Liked Songs', count: 0, color: '#824EFF', icon: '♥' },
+  { id: 'liked-songs', name: 'Liked Songs', count: 0, color: colors.accent, icon: '♥' },
 ];
 const legacyDemoPlaylistIds = new Set(['chill-vibes', 'workout', 'afrobeats', 'rock-classics']);
 
@@ -18,6 +19,7 @@ export function MusicProvider({ children }) {
   const [currentTrack, setCurrentTrack] = useState(null);
   const [queue, setQueue] = useState([]);
   const [recentTracks, setRecentTracks] = useState([]);
+  const [playCounts, setPlayCounts] = useState({});
   const [liked, setLiked] = useState([]);
   const [removedFavoriteTitles, setRemovedFavoriteTitles] = useState([]);
   const [menu, setMenu] = useState(null);
@@ -67,6 +69,7 @@ export function MusicProvider({ children }) {
         if (Array.isArray(saved.deletedRemotePlaylistIds)) setDeletedRemotePlaylistIds(saved.deletedRemotePlaylistIds);
         if (Array.isArray(saved.removedFavoriteTitles)) setRemovedFavoriteTitles(saved.removedFavoriteTitles);
         if (Array.isArray(saved.liked)) setLiked(saved.liked);
+        if (saved.playCounts && typeof saved.playCounts === 'object') setPlayCounts(saved.playCounts);
         const savedTrackIds = new Set(savedTracks.map((track) => track.id));
         const savedPlaylistTracks = Object.fromEntries(Object.entries(rawPlaylistTracks).map(([id, tracks]) => [id, Array.isArray(tracks) ? tracks.filter((track) => savedTrackIds.has(track.id)) : []]));
         if (Array.isArray(saved.playlists)) {
@@ -88,8 +91,8 @@ export function MusicProvider({ children }) {
 
   useEffect(() => {
     if (!stateHydrated) return;
-    Storage.setItem('tuneit-library-v1', JSON.stringify({ liked, removedFavoriteTitles, playlists, playlistTracks, deletedRemotePlaylistIds, localTracks, recentTracks })).catch(() => {});
-  }, [stateHydrated, liked, removedFavoriteTitles, playlists, playlistTracks, deletedRemotePlaylistIds, localTracks, recentTracks]);
+    Storage.setItem('tuneit-library-v1', JSON.stringify({ liked, removedFavoriteTitles, playlists, playlistTracks, deletedRemotePlaylistIds, localTracks, recentTracks, playCounts })).catch(() => {});
+  }, [stateHydrated, liked, removedFavoriteTitles, playlists, playlistTracks, deletedRemotePlaylistIds, localTracks, recentTracks, playCounts]);
 
   const notify = useCallback((message) => {
     setToast(message);
@@ -110,6 +113,7 @@ export function MusicProvider({ children }) {
     const nextTrack = { ...track, audioUrl };
     setHistory((items) => (currentTrack ? items.concat(currentTrack) : items).slice(-20));
     setRecentTracks((items) => [nextTrack, ...items.filter((item) => item.id !== nextTrack.id && item.title !== nextTrack.title)].slice(0, 30));
+    setPlayCounts((counts) => ({ ...counts, [nextTrack.id]: (counts[nextTrack.id] || 0) + 1 }));
     setCurrentTrack(nextTrack);
     if (track.localUri) setQueue(localTracks.filter((item) => item.id !== track.id));
     player.replace(nextTrack.audioUrl);
@@ -265,7 +269,7 @@ export function MusicProvider({ children }) {
       return false;
     }
     const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    setPlaylists((items) => [...items, { id, name: cleanName, count: initialTrack ? 1 : 0, color: '#7451BC', icon: '♫' }]);
+    setPlaylists((items) => [...items, { id, name: cleanName, count: initialTrack ? 1 : 0, color: colors.cardLight, icon: '♫' }]);
     if (initialTrack) setPlaylistTracks((items) => ({ ...items, [id]: [initialTrack] }));
     notify(initialTrack ? `Created “${cleanName}” and added ${initialTrack.title}` : `Created “${cleanName}”`);
     return id;
@@ -353,7 +357,7 @@ export function MusicProvider({ children }) {
       const localPlaylist = playlists.find((item) => item.name.toLocaleLowerCase() === remote.name.toLocaleLowerCase());
       const localId = localPlaylist?.id || `cloud-${remote.id}`;
       remotePlaylistTracks[localId] = (remote.songs || []).map((song) => tracksByKey.get(song.device_key)).filter(Boolean);
-      return { id: localId, remoteId: remote.id, name: remote.name, count: remotePlaylistTracks[localId].length, color: localPlaylist?.color || '#7451BC', icon: localPlaylist?.icon || '♫' };
+      return { id: localId, remoteId: remote.id, name: remote.name, count: remotePlaylistTracks[localId].length, color: localPlaylist?.color || colors.cardLight, icon: localPlaylist?.icon || '♫' };
     });
     setPlaylists((items) => {
       const remoteNames = new Set(cloudPlaylists.map((item) => item.name.toLocaleLowerCase()));
@@ -365,13 +369,13 @@ export function MusicProvider({ children }) {
   }, [user, localTracks, liked, playlists, playlistTracks, deletedRemotePlaylistIds, removedFavoriteTitles, notify]);
 
   const value = useMemo(() => ({
-    player, playerStatus, currentTrack, queue, recentTracks, liked, playlists, playlistTracks, localTracks, libraryStatus, libraryImporting, libraryError, user, authStatus, authError, menu, toast, repeat, shuffle, volume, searchQuery,
+    player, playerStatus, currentTrack, queue, recentTracks, playCounts, liked, playlists, playlistTracks, localTracks, libraryStatus, libraryImporting, libraryError, user, authStatus, authError, menu, toast, repeat, shuffle, volume, searchQuery,
     setMenu, setRepeat, setShuffle, playTrack, playTrackFromList, playQueuedTrack, togglePlay, playNext, playPrevious,
     addToQueue, toggleLike, setVolume, clearQueue, notify, setSearchQuery,
     createPlaylist, renamePlaylist, removePlaylist, scanLocalMusic, importLocalMusic, addTrackToPlaylist, removeTrackFromPlaylist,
     signIn, signUp, signOut, syncLibrary,
   }), [player, playerStatus, currentTrack, queue, liked, playlists, menu, toast, repeat, shuffle, volume, authError,
-    playlistTracks, deletedRemotePlaylistIds, removedFavoriteTitles, localTracks, recentTracks, libraryStatus, libraryImporting, libraryError, user, authStatus, searchQuery, playTrack, playTrackFromList, playQueuedTrack, togglePlay, playNext, playPrevious, addToQueue, toggleLike, setVolume, clearQueue, notify, setSearchQuery, createPlaylist, renamePlaylist, removePlaylist, scanLocalMusic, importLocalMusic, addTrackToPlaylist, removeTrackFromPlaylist, signIn, signUp, signOut, syncLibrary]);
+    playlistTracks, deletedRemotePlaylistIds, removedFavoriteTitles, localTracks, recentTracks, playCounts, libraryStatus, libraryImporting, libraryError, user, authStatus, searchQuery, playTrack, playTrackFromList, playQueuedTrack, togglePlay, playNext, playPrevious, addToQueue, toggleLike, setVolume, clearQueue, notify, setSearchQuery, createPlaylist, renamePlaylist, removePlaylist, scanLocalMusic, importLocalMusic, addTrackToPlaylist, removeTrackFromPlaylist, signIn, signUp, signOut, syncLibrary]);
 
   return <MusicContext.Provider value={value}>{children}</MusicContext.Provider>;
 }

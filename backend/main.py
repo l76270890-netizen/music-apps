@@ -16,7 +16,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(title="TuneIt API", version="0.1.0", description="Account and music-library metadata API. Audio stays on the user's device.")
 origins = [origin.strip().rstrip("/") for origin in os.getenv("CORS_ORIGINS", "http://localhost:8081,http://localhost:8082,http://localhost:19006").split(",") if origin.strip()]
 app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
-
+  
 
 def playlist_view(db: Session, playlist: Playlist) -> PlaylistView:
     songs = db.scalars(
@@ -188,3 +188,6 @@ def remove_playlist_song(playlist_id: int, song_id: int, db: Session = Depends(g
     playlist.songs = [existing for existing in playlist.songs if existing.id != song.id]
     db.commit()
     return playlist_view(db, playlist)
+
+
+

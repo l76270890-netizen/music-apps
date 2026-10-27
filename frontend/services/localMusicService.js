@@ -2,7 +2,6 @@ import { Platform } from 'react-native';
 import * as MediaLibrary from 'expo-media-library/legacy';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
-import { colors } from '../constants/colors';
 
 function titleFromFilename(filename = '') {
   return filename.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim() || 'Untitled track';
@@ -11,6 +10,13 @@ function titleFromFilename(filename = '') {
 function durationLabel(seconds = 0) {
   const value = Math.max(0, Math.floor(seconds || 0));
   return `${Math.floor(value / 60)}:${String(value % 60).padStart(2, '0')}`;
+}
+
+function coverColor(seed = '') {
+  const palette = ['#FF8616', '#CF5E3B', '#305D73', '#6C4F73', '#A3453C'];
+  let hash = 0;
+  for (let index = 0; index < seed.length; index += 1) hash = (hash * 31 + seed.charCodeAt(index)) >>> 0;
+  return palette[hash % palette.length];
 }
 
 function toTrack(asset, index) {
@@ -28,7 +34,7 @@ function toTrack(asset, index) {
     time: durationLabel(duration),
     audioUrl: asset.uri,
     localUri: asset.uri,
-    color: colors.cardLight,
+    color: coverColor(`${artist}-${asset.album || ''}-${title}`),
     art: '♫',
     source: asset.source || 'device',
   };

@@ -9,6 +9,26 @@ services:
       - key: EXPO_PUBLIC_API_URL
         sync: false
     headers:
+      # PWA installability: the manifest must be served as JSON and sw.js as
+      # JavaScript at the site root, both uncached so updates roll out.
+      - path: /manifest.json
+        name: Content-Type
+        value: application/manifest+json
+      - path: /manifest.json
+        name: Cache-Control
+        value: public, max-age=0, must-revalidate
+      - path: /sw.js
+        name: Content-Type
+        value: text/javascript; charset=utf-8
+      - path: /sw.js
+        name: Cache-Control
+        value: public, max-age=0, must-revalidate
+      - path: /sw.js
+        name: Service-Worker-Allowed
+        value: /
+      - path: /icons/*
+        name: Cache-Control
+        value: public, max-age=31536000, immutable
       - path: /*
         name: Cross-Origin-Embedder-Policy
         value: credentialless
@@ -16,6 +36,8 @@ services:
         name: Cross-Origin-Opener-Policy
         value: same-origin
     routes:
+      # Keep real files (manifest.json, sw.js, icons/, _expo/) reachable and only
+      # fall back to the SPA shell for client-side routes.
       - type: rewrite
         source: /manifest.json
         destination: /manifest.json
@@ -25,6 +47,9 @@ services:
       - type: rewrite
         source: /icons/*
         destination: /icons/:file
+      - type: rewrite
+        source: /_expo/*
+        destination: /_expo/:file
       - type: rewrite
         source: /*
         destination: /index.html

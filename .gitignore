@@ -1,0 +1,12 @@
+node_modules/
+.expo/
+.env
+.env.*
+!.env.example
+**/.venv/
+**/__pycache__/
+*.py[cod]
+backend/*.db
+# Local scratch/worktree copies
+.git-push-worktree/
+frontend/scripts/qa-pwa.mjs

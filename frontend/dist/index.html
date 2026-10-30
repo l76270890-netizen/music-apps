@@ -23,7 +23,16 @@
         flex: 1;
       }
     </style>
-  </head>
+    <link rel="manifest" href="/manifest.json" />
+  <meta name="application-name" content="TuneIt" />
+  <link rel="icon" type="image/png" href="/icons/tuneit-192.png" />
+  <link rel="apple-touch-icon" href="/icons/tuneit-512.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="TuneIt" />
+  <meta name="theme-color" content="#FF8615" />
+</head>
 
   <body>
     <!-- Use static rendering with Expo Router to support running without JavaScript. -->
@@ -32,6 +41,7 @@
     </noscript>
     <!-- The root element for your Expo app. -->
     <div id="root"></div>
-  <script src="/_expo/static/js/web/entry-2ac802f53a4fa5de3b0510f943711f6e.js" defer></script>
+  <script src="/_expo/static/js/web/entry-2f8b88c7337d77893ca56a2509bf48c2.js" defer></script>
+  <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});});}</script>
 </body>
 </html>

@@ -130,6 +130,11 @@ function MiniNowPlaying({ router }) {
   const [volumeWidth, setVolumeWidth] = useState(200);
   if (!currentTrack) return <View style={s.rightPanel}><Text style={s.nowEyebrow}>YOUR PLAYER</Text><View style={[s.nowArt, { alignItems: 'center' }]}><Text style={s.scanMusic}>♫</Text></View><Text style={s.nowTitle}>No song selected</Text><Text style={s.nowArtist}>Choose a file from Local Music.</Text><TouchableOpacity onPress={() => router.push('/local-music')} style={{ marginTop: 18 }}><Text style={s.seeAll}>Open local library ↗</Text></TouchableOpacity></View>;
   const progress = playerStatus.duration ? playerStatus.currentTime / playerStatus.duration : 0;
+  const seekAtX = (event) => {
+    if (!playerStatus.duration || !seekWidth) return;
+    const ratio = Math.max(0, Math.min(1, event.nativeEvent.locationX / seekWidth));
+    player.seekTo(ratio * playerStatus.duration);
+  };
   return (
       <View style={s.rightPanel}>
       <View style={s.nowTop}><Text style={s.nowEyebrow}>NOW PLAYING</Text><TouchableOpacity onPress={() => setMenu({ type: 'track', track: currentTrack })}><Text style={s.more}>•••</Text></TouchableOpacity></View>
@@ -137,7 +142,7 @@ function MiniNowPlaying({ router }) {
         <View style={s.nowArt}><Cover size={190} round={20} color={currentTrack.color} icon={currentTrack.art} imageUri={currentTrack.artwork} /></View>
         <Text style={s.nowTitle}>{currentTrack.title}</Text><Text style={s.nowArtist}>{currentTrack.artist}</Text>
       </TouchableOpacity>
-      <TouchableOpacity accessibilityRole="adjustable" accessibilityLabel="Seek in track" activeOpacity={1} onLayout={(event) => setSeekWidth(event.nativeEvent.layout.width || 274)} onPress={(event) => playerStatus.duration && player.seekTo((event.nativeEvent.locationX / seekWidth) * playerStatus.duration)} style={s.progressTrack}><View style={[s.progressFill, { width: `${Math.max(0, Math.min(1, progress)) * 100}%` }]} /><View style={[s.progressDot, { left: `${Math.max(0, Math.min(1, progress)) * 100}%` }]} /></TouchableOpacity>
+      <View accessibilityRole="adjustable" accessibilityLabel="Track progress" accessibilityValue={{ min: 0, max: playerStatus.duration || 0, now: playerStatus.currentTime || 0 }} onLayout={(event) => setSeekWidth(event.nativeEvent.layout.width || 274)} onStartShouldSetResponder={() => Boolean(playerStatus.duration)} onMoveShouldSetResponder={() => Boolean(playerStatus.duration)} onResponderGrant={seekAtX} onResponderMove={seekAtX} style={s.progressTouch}><View style={s.progressTrack}><View style={[s.progressFill, { width: `${Math.max(0, Math.min(1, progress)) * 100}%` }]} /><View style={[s.progressDot, { left: `${Math.max(0, Math.min(1, progress)) * 100}%` }]} /></View></View>
       <View style={s.timeRow}><Text style={s.duration}>{formatTime(playerStatus.currentTime)}</Text><Text style={s.duration}>{formatTime(playerStatus.duration || currentTrack.duration)}</Text></View>
       <View style={s.playerControls}><TouchableOpacity accessibilityRole="button" accessibilityLabel={shuffle ? 'Disable shuffle' : 'Enable shuffle'} onPress={() => setShuffle(!shuffle)}><Text style={[s.control, shuffle && s.activeText]}>⤨</Text></TouchableOpacity><TouchableOpacity accessibilityRole="button" accessibilityLabel="Previous track" onPress={playPrevious}><Text style={s.control}>|◀</Text></TouchableOpacity><TouchableOpacity accessibilityRole="button" accessibilityLabel={playerStatus.playing ? 'Pause' : 'Play'} onPress={togglePlay} style={s.playButton}><Text style={s.playGlyph}>{playerStatus.playing ? 'Ⅱ' : '▶'}</Text></TouchableOpacity><TouchableOpacity accessibilityRole="button" accessibilityLabel="Next track" onPress={playNext}><Text style={s.control}>▶|</Text></TouchableOpacity><TouchableOpacity accessibilityRole="button" accessibilityLabel={repeat ? 'Disable repeat' : 'Enable repeat'} onPress={() => setRepeat(!repeat)}><Text style={[s.control, repeat && s.activeText]}>⤻</Text></TouchableOpacity></View>
        <View style={s.volume}>

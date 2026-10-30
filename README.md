@@ -28,4 +28,6 @@ Deploy the two services from this repository using these independent root direct
 | Render Static Site | `frontend` | `npm ci && npm run build:web`; publish `dist` |
 | Render Web Service | `backend` | `pip install -r requirements.txt`; start with `uvicorn main:app --host 0.0.0.0 --port $PORT` |
 
+The frontend web build is a **PWA**: visitors install it directly from the browser — no APK or EXE. See [frontend/README.md](frontend/README.md#install-as-an-app-pwa) for the Windows, Android and iPhone install steps.
+
 The root `render.yaml` configures the frontend as a Render Static Site. Set `EXPO_PUBLIC_API_URL` to the backend's Render URL when prompted. Set `CORS_ORIGINS` on the backend to the frontend's Render origin. See [backend/README.md](backend/README.md) for the backend's required database and security variables.

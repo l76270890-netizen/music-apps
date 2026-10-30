@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, SafeAreaView, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useMusic } from '../context/MusicContext';
+import InstallAppCard from '../components/InstallAppCard';
 import { apiBaseUrlConfigured } from '../services/api';
 import { colors } from '../constants/colors';
 
@@ -54,6 +55,7 @@ export default function AccountScreen() {
         <TouchableOpacity accessibilityRole="button" accessibilityLabel="Go back" onPress={() => router.canGoBack() ? router.back() : router.replace('/')}><Text style={{ color: colors.accent, fontSize: 14 }}>‹  Back</Text></TouchableOpacity>
         <Text style={{ color: colors.text, fontSize: 28, fontWeight: '800', marginTop: 28 }}>TuneIt account</Text>
         <Text style={{ color: colors.muted, fontSize: 13, lineHeight: 20, marginTop: 8 }}>Your audio files stay on your device. Sign in to sync song details, favorites, and playlists.</Text>
+        <InstallAppCard style={{ marginTop: 20 }} />
         {!configured && <View style={{ padding: 14, backgroundColor: colors.panel, borderRadius: 12, marginTop: 20 }}><Text style={{ color: colors.text, fontSize: 12, lineHeight: 18 }}>Sign in and sync are optional. Local music playback works offline. To sync favorites and playlists, set EXPO_PUBLIC_API_URL and restart Expo.</Text></View>}
         {authStatus === 'loading' ? <View accessibilityRole="progressbar" style={{ marginTop: 30, alignItems: 'center', gap: 12 }}><ActivityIndicator color={colors.accentLight} /><Text style={{ color: colors.muted }}>Checking your account…</Text></View> : user ? <View style={{ marginTop: 24, padding: 18, borderRadius: 16, backgroundColor: colors.panel, borderWidth: 1, borderColor: colors.line }}>
           <Text style={{ color: colors.text, fontSize: 17, fontWeight: '700' }}>{user.username}</Text><Text style={{ color: colors.muted, marginTop: 5 }}>{user.email}</Text>

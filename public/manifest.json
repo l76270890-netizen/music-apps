@@ -1,0 +1,76 @@
+{
+  "id": "/?source=pwa",
+  "name": "TuneIt - Offline Music Player",
+  "short_name": "TuneIt",
+  "description": "Your music, your way. Listen to your favorite songs offline with TuneIt.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#17181F",
+  "theme_color": "#FF8615",
+  "categories": ["music", "entertainment"],
+  "icons": [
+    {
+      "src": "/icons/tuneit-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/tuneit-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/tuneit-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/icons/tuneit-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "TuneIt on desktop"
+    },
+    {
+      "src": "/icons/tuneit-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "label": "TuneIt on mobile"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Local Music",
+      "short_name": "Local",
+      "description": "Open the music stored on this device",
+      "url": "/local-music",
+      "icons": [{ "src": "/icons/tuneit-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Liked Songs",
+      "short_name": "Liked",
+      "description": "Listen to your favorite tracks",
+      "url": "/favorites",
+      "icons": [{ "src": "/icons/tuneit-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Your Playlists",
+      "short_name": "Playlists",
+      "description": "Open your music playlists",
+      "url": "/playlists",
+      "icons": [{ "src": "/icons/tuneit-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ],
+  "launch_handler": { "client_mode": "navigate-existing" },
+  "prefer_related_applications": false
+}

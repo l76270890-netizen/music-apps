@@ -24,13 +24,27 @@ if (!fs.existsSync(indexPath)) {
 // 1. Copy static PWA assets into the export output.
 fs.cpSync(publicDir, dist, { recursive: true, force: true });
 
-const required = ['manifest.json', 'sw.js', 'icons/tuneit-192.png', 'icons/tuneit-512.png', 'icons/tuneit-maskable-512.png'];
+const required = [
+  'manifest.json',
+  'sw.js',
+  'icons/tuneit-icon.svg',
+  'icons/tuneit-favicon-48.png',
+  'icons/tuneit-apple-180.png',
+  'icons/tuneit-192.png',
+  'icons/tuneit-512.png',
+  'icons/tuneit-maskable-512.png',
+  'icons/tuneit-maskable.svg',
+];
 for (const file of required) {
   if (!fs.existsSync(path.join(dist, file))) {
     console.error(`Missing required PWA asset in dist: ${file}`);
     process.exit(1);
   }
 }
+
+// 1b. Expo emits its own default favicon.ico — replace it so the browser tab
+// shows the TuneIt icon too.
+fs.copyFileSync(path.join(publicDir, 'icons', 'tuneit-favicon-48.png'), path.join(dist, 'favicon.ico'));
 
 // 2. Validate the manifest itself (browser install prompts need these fields).
 const manifest = JSON.parse(fs.readFileSync(path.join(dist, 'manifest.json'), 'utf8'));
@@ -51,8 +65,10 @@ let html = fs.readFileSync(indexPath, 'utf8');
 const headTags = [
   '<link rel="manifest" href="/manifest.json" />',
   '<meta name="application-name" content="TuneIt" />',
-  '<link rel="icon" type="image/png" href="/icons/tuneit-192.png" />',
-  '<link rel="apple-touch-icon" href="/icons/tuneit-512.png" />',
+  '<link rel="icon" type="image/png" sizes="48x48" href="/icons/tuneit-favicon-48.png" />',
+  '<link rel="icon" type="image/png" sizes="192x192" href="/icons/tuneit-192.png" />',
+  '<link rel="icon" type="image/png" sizes="512x512" href="/icons/tuneit-512.png" />',
+  '<link rel="apple-touch-icon" sizes="180x180" href="/icons/tuneit-apple-180.png" />',
   '<meta name="mobile-web-app-capable" content="yes" />',
   '<meta name="apple-mobile-web-app-capable" content="yes" />',
   '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />',

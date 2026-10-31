@@ -4,13 +4,17 @@
  * over HTTPS (or http://localhost) with a JavaScript content-type, otherwise
  * browsers refuse to register it and the app cannot be installed.
  */
-const CACHE_NAME = 'tuneit-v2';
+const CACHE_NAME = 'tuneit-v4';
 const APP_SHELL = [
   '/',
   '/manifest.json',
+  '/icons/tuneit-icon.svg',
+  '/icons/tuneit-favicon-48.png',
+  '/icons/tuneit-apple-180.png',
   '/icons/tuneit-192.png',
   '/icons/tuneit-512.png',
   '/icons/tuneit-maskable-512.png',
+  '/icons/tuneit-maskable.svg',
 ];
 
 // Backend API requests are never cached: music metadata / auth must stay live.

@@ -6,11 +6,21 @@ import InstallHandoff from '../components/InstallHandoff';
 import { startLaunchHandoffIfRequested } from '../hooks/usePwaInstall';
 import { colors } from '../constants/colors';
 
+<<<<<<< HEAD
 // If this tab was opened by the install hand-off, open the installed app now
 // instead of rendering another browser tab.
 function InstallHandoffGate() {
   const [handingOff] = useState(startLaunchHandoffIfRequested);
   return handingOff ? <InstallHandoff /> : null;
+=======
+// Runs at the very start of the render, before the Stack (and its screen) can
+// mount: if this tab was opened by the install hand-off, open the installed app
+// instead of rendering a second browser tab.
+const handedOff = startLaunchHandoffIfRequested();
+
+function InstallHandoffGate() {
+  return handedOff ? <InstallHandoff /> : null;
+>>>>>>> c454369 (Updated music app icons and installation features)
 }
 
 export default function RootLayout() {

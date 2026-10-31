@@ -3,8 +3,21 @@
     "name": "TuneIt",
     "slug": "tuneit-music-app",
     "scheme": "tuneit",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#17181F"
+    },
     "android": {
-      "package": "com.tuneit.musicapp"
+      "package": "com.tuneit.musicapp",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FF8616"
+      }
+    },
+    "ios": {
+      "supportsTablet": true
     },
     "plugins": [
       "expo-router",
@@ -34,7 +47,8 @@
       "typedRoutes": true
     },
     "web": {
-      "bundler": "metro"
+      "bundler": "metro",
+      "favicon": "./assets/favicon.png"
     }
   }
 }

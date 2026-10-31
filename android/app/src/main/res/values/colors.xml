@@ -1,4 +1,11 @@
+<<<<<<< HEAD
 <resources>
   <color name="splashscreen_background">#FFFFFF</color>
   <color name="colorPrimary">#023c69</color>
+=======
+<resources>
+  <color name="splashscreen_background">#FFFFFF</color>
+  <color name="colorPrimary">#FF8616</color>
+  <color name="iconBackground">#FF8616</color>
+>>>>>>> c454369 (Updated music app icons and installation features)
 </resources>

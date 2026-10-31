@@ -8,11 +8,17 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
   "orientation": "any",
   "background_color": "#17181F",
   "theme_color": "#FF8615",
-  "categories": ["music", "entertainment"],
+  "categories": [
+    "music",
+    "entertainment"
+  ],
   "icons": [
     {
       "src": "/icons/tuneit-icon.svg",
@@ -78,24 +84,44 @@
       "short_name": "Local",
       "description": "Open the music stored on this device",
       "url": "/local-music",
-      "icons": [{ "src": "/icons/tuneit-192.png", "sizes": "192x192", "type": "image/png" }]
+      "icons": [
+        {
+          "src": "/icons/tuneit-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     },
     {
       "name": "Liked Songs",
       "short_name": "Liked",
       "description": "Listen to your favorite tracks",
       "url": "/favorites",
-      "icons": [{ "src": "/icons/tuneit-192.png", "sizes": "192x192", "type": "image/png" }]
+      "icons": [
+        {
+          "src": "/icons/tuneit-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     },
     {
       "name": "Your Playlists",
       "short_name": "Playlists",
       "description": "Open your music playlists",
       "url": "/playlists",
-      "icons": [{ "src": "/icons/tuneit-192.png", "sizes": "192x192", "type": "image/png" }]
+      "icons": [
+        {
+          "src": "/icons/tuneit-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ],
-  "launch_handler": { "client_mode": "focus-existing" },
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
   "handle_links": "preferred",
   "prefer_related_applications": false
 }

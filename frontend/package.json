@@ -10,7 +10,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "build:web": "expo export --platform web && node scripts/inject-pwa-tags.js",
-    "preview:web": "node scripts/serve-dist.js"
+    "preview:web": "node scripts/serve-dist.js",
+    "icons": "node scripts/generate-icons.js"
   },
   "dependencies": {
     "expo": "~57.0.0",

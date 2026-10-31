@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#FFA64D"/>
+    <stop offset="0.55" stop-color="#FF8616"/>
+    <stop offset="1" stop-color="#FF6A00"/>
+  </linearGradient>
+  <linearGradient id="swoosh" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.98"/>
+    <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.85"/>
+  </linearGradient>
+  <radialGradient id="dish" cx="0.34" cy="0.28" r="0.85">
+    <stop offset="0" stop-color="#33353F"/>
+    <stop offset="1" stop-color="#17181F"/>
+  </radialGradient>
+</defs>
+<rect width="1024" height="1024" fill="url(#bg)"/>
+<g transform="translate(512 512) scale(1) translate(-512 -512)">
+  <!-- vinyl record: solid dark disc, faint grooves, glossy highlight -->
+  <circle cx="512" cy="512" r="324" fill="#0F1015" fill-opacity="0.22"/>
+  <circle cx="512" cy="512" r="300" fill="url(#dish)"/>
+  <circle cx="512" cy="512" r="300" fill="none" stroke="#FFFFFF" stroke-opacity="0.14" stroke-width="4"/>
+  <circle cx="512" cy="512" r="250" fill="none" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="3"/>
+  <path d="M300 350 A240 240 0 0 1 470 222" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="26" stroke-linecap="round"/>
+  <!-- equalizer bars, kept clear of the centre so the play badge stays legible -->
+  <g fill="url(#swoosh)">
+    <rect x="384" y="474" width="26" height="76" rx="13"/>
+    <rect x="440" y="436" width="26" height="152" rx="13"/>
+    <rect x="558" y="436" width="26" height="152" rx="13"/>
+    <rect x="614" y="474" width="26" height="76" rx="13"/>
+  </g>
+  <!-- play badge on the spindle -->
+  <circle cx="512" cy="512" r="96" fill="#FF8616"/>
+  <circle cx="512" cy="512" r="96" fill="none" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="6"/>
+  <path d="M490 466 L566 512 L490 558 Z" fill="#FFFFFF"/>
+</g>
+</svg>

@@ -88,11 +88,40 @@ function svgMarkup({ maskable = false } = {}) {
 `;
 }
 
+/* Adaptive foreground: glyph only, no orange background plate (the colour comes
+ * from the <background> layer), otherwise you get an orange square on orange. */
+function adaptiveForegroundSvg() {
+  return svgMarkup({ maskable: true })
+    .replace('<rect width="1024" height="1024" fill="url(#bg)"/>', '')
+    .replace(/<circle cx="512" cy="512" r="324" fill="#0F1015" fill-opacity="0.22"\/>/, '');
+}
+
 function svgMaskable() {
   // Maskable versions must fill the entire square (no transparent corners),
   // otherwise the launcher mask shows white/black wedges.
   return svgMarkup({ maskable: true });
 }
+
+/* Android shares one resource name per density, so the round launcher icon is
+ * the same artwork with a circular mask cropped into the file. */
+function roundedSvg(radiusRatio) {
+  const r = Math.round(1024 * radiusRatio);
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024"><defs><clipPath id="c"><rect width="1024" height="1024" rx="${r}" ry="${r}"/></clipPath></defs>` +
+    `<g clip-path="url(#c)">${svgMarkup().replace(/^<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '')}</g></svg>`;
+}
+
+/* Android launcher icons live in android/.../mipmap-<density>/ — expo prebuild
+ * will not refresh them after the fact, so the generator writes them directly. */
+const ANDROID_MIPMAPS = [
+  { dir: 'mdpi', legacy: 48, adaptive: 108 },
+  { dir: 'hdpi', legacy: 72, adaptive: 162 },
+  { dir: 'xhdpi', legacy: 96, adaptive: 216 },
+  { dir: 'xxhdpi', legacy: 144, adaptive: 324 },
+  { dir: 'xxxhdpi', legacy: 192, adaptive: 432 },
+];
+// Adaptive icon layers are 108dp and launchers crop to the inner 72dp circle,
+// so the artwork is scaled down inside a 72/108 = 66% safe area.
+const ADAPTIVE_INSET = 72 / 108;
 
 function writeSvgs() {
   fs.writeFileSync(sourceSvg, svgMarkup());
@@ -132,6 +161,54 @@ async function main() {
       await img.png({ compressionLevel: 9 }).toFile(dest);
       console.log(`  ${path.relative(root, dest)} (${size}x${size})`);
     }
+  }
+
+  // Android native launcher resources (legacy square + round, adaptive layers).
+  const androidApp = path.join(root, 'android', 'app', 'src', 'main', 'res');
+  if (fs.existsSync(path.join(root, 'android', 'app'))) {
+    for (const { dir, legacy } of ANDROID_MIPMAPS) {
+      const mipmap = path.join(androidApp, `mipmap-${dir}`);
+      fs.mkdirSync(mipmap, { recursive: true });
+      await sharp(base).resize(legacy, legacy).png().toFile(path.join(mipmap, 'ic_launcher.png'));
+      await sharp(Buffer.from(roundedSvg(0.5))).resize(legacy, legacy).png().toFile(path.join(mipmap, 'ic_launcher_round.png'));
+      // Drop the stale .webp launchers: Android prefers .webp over .png in the
+      // same mipmap folder, so leaving them is exactly why the old letter icon
+      // kept showing up after a rebuild.
+      for (const stale of ['ic_launcher.webp', 'ic_launcher_round.webp']) {
+        fs.rmSync(path.join(mipmap, stale), { force: true });
+      }
+    }
+
+    // Adaptive icon: solid accent background + inset foreground (API 26+).
+    const adaptive = path.join(androidApp, 'mipmap-anydpi-v26');
+    fs.mkdirSync(adaptive, { recursive: true });
+    const adaptiveXml = `<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+  <background android:drawable="@color/iconBackground"/>
+  <foreground android:drawable="@mipmap/ic_launcher_foreground"/>
+</adaptive-icon>
+`;
+    fs.writeFileSync(path.join(adaptive, 'ic_launcher.xml'), adaptiveXml);
+    fs.writeFileSync(path.join(adaptive, 'ic_launcher_round.xml'), adaptiveXml);
+
+    for (const { dir, adaptive: size } of ANDROID_MIPMAPS) {
+      const mipmap = path.join(androidApp, `mipmap-${dir}`);
+      fs.mkdirSync(mipmap, { recursive: true });
+      // Foreground is the glyph on transparency, inside the 66% safe circle;
+      // the solid colour comes from the <background> layer in the adaptive XML.
+      await sharp(await sharp(Buffer.from(adaptiveForegroundSvg())).png().toBuffer())
+        .resize(Math.round(size * ADAPTIVE_INSET), Math.round(size * ADAPTIVE_INSET))
+        .extend({
+          top: Math.round((size * (1 - ADAPTIVE_INSET)) / 2),
+          bottom: Math.round((size * (1 - ADAPTIVE_INSET)) / 2),
+          left: Math.round((size * (1 - ADAPTIVE_INSET)) / 2),
+          right: Math.round((size * (1 - ADAPTIVE_INSET)) / 2),
+          background: { r: 0, g: 0, b: 0, alpha: 0 },
+        })
+        .png()
+        .toFile(path.join(mipmap, 'ic_launcher_foreground.png'));
+    }
+    console.log('  android/.../mipmap-*: ic_launcher(.png/.webp removed), _round, adaptive layers');
   }
 
   console.log('TuneIt icons generated.');

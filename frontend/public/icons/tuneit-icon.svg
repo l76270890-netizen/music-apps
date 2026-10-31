@@ -1,37 +1,47 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
 <defs>
-  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+  <linearGradient id="tile" x1="0" y1="0" x2="0.4" y2="1">
+    <stop offset="0" stop-color="#2B2C34"/>
+    <stop offset="0.55" stop-color="#1F2028"/>
+    <stop offset="1" stop-color="#14151B"/>
+  </linearGradient>
+  <linearGradient id="frame" x1="0" y1="0" x2="1" y2="1">
     <stop offset="0" stop-color="#FFA64D"/>
-    <stop offset="0.55" stop-color="#FF8616"/>
     <stop offset="1" stop-color="#FF6A00"/>
   </linearGradient>
-  <linearGradient id="swoosh" x1="0" y1="0" x2="1" y2="0">
-    <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.98"/>
-    <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.85"/>
-  </linearGradient>
-  <radialGradient id="dish" cx="0.34" cy="0.28" r="0.85">
-    <stop offset="0" stop-color="#33353F"/>
-    <stop offset="1" stop-color="#17181F"/>
+  <radialGradient id="glow" cx="0.5" cy="0.5" r="0.55">
+    <stop offset="0" stop-color="#FF8616" stop-opacity="0.35"/>
+    <stop offset="1" stop-color="#FF8616" stop-opacity="0"/>
   </radialGradient>
+  <linearGradient id="orange" x1="0" y1="0" x2="0.5" y2="1">
+    <stop offset="0" stop-color="#FFA64D"/>
+    <stop offset="0.5" stop-color="#FF8616"/>
+    <stop offset="1" stop-color="#F06A00"/>
+  </linearGradient>
 </defs>
-<rect width="1024" height="1024" fill="url(#bg)"/>
+<rect width="1024" height="1024" fill="url(#tile)"/>
+<!-- glossy sheen sweeping the top-left corner -->
+<path d="M0 0 H1024 L0 620 Z" fill="#FFFFFF" fill-opacity="0.035"/>
+<rect width="1024" height="1024" fill="url(#glow)"/>
+<!-- orange rounded frame -->
+<rect x="26" y="26" width="972" height="972" rx="190" fill="none" stroke="url(#frame)" stroke-width="30"/>
 <g transform="translate(512 512) scale(1) translate(-512 -512)">
-  <!-- vinyl record: solid dark disc, faint grooves, glossy highlight -->
-  <circle cx="512" cy="512" r="324" fill="#0F1015" fill-opacity="0.22"/>
-  <circle cx="512" cy="512" r="300" fill="url(#dish)"/>
-  <circle cx="512" cy="512" r="300" fill="none" stroke="#FFFFFF" stroke-opacity="0.14" stroke-width="4"/>
-  <circle cx="512" cy="512" r="250" fill="none" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="3"/>
-  <path d="M300 350 A240 240 0 0 1 470 222" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="26" stroke-linecap="round"/>
-  <!-- equalizer bars, kept clear of the centre so the play badge stays legible -->
-  <g fill="url(#swoosh)">
-    <rect x="384" y="474" width="26" height="76" rx="13"/>
-    <rect x="440" y="436" width="26" height="152" rx="13"/>
-    <rect x="558" y="436" width="26" height="152" rx="13"/>
-    <rect x="614" y="474" width="26" height="76" rx="13"/>
+  <!-- vinyl record behind the note -->
+  <circle cx="512" cy="512" r="250" fill="url(#orange)" fill-opacity="0.16"/>
+  <circle cx="512" cy="512" r="250" fill="none" stroke="url(#orange)" stroke-opacity="0.55" stroke-width="6"/>
+  <circle cx="512" cy="512" r="206" fill="none" stroke="#FF8616" stroke-opacity="0.28" stroke-width="3"/>
+  <circle cx="512" cy="512" r="162" fill="none" stroke="#FF8616" stroke-opacity="0.2" stroke-width="3"/>
+  <!-- equalizer bars -->
+  <g fill="url(#orange)"><rect x="132" y="469" width="30" height="86" rx="15"/><rect x="186" y="448" width="30" height="128" rx="15"/><rect x="240" y="464" width="30" height="96" rx="15"/><rect x="294" y="437" width="30" height="150" rx="15"/><rect x="700" y="437" width="30" height="150" rx="15"/><rect x="754" y="464" width="30" height="96" rx="15"/><rect x="808" y="448" width="30" height="128" rx="15"/><rect x="862" y="469" width="30" height="86" rx="15"/></g>
+  <!-- music note: two heads, stem, and a slanted beam -->
+  <g fill="url(#orange)">
+    <ellipse cx="438" cy="646" rx="58" ry="44" transform="rotate(-18 438 646)"/>
+    <ellipse cx="600" cy="616" rx="58" ry="44" transform="rotate(-18 600 616)"/>
+    <path d="M470 372 h38 v282 a19 19 0 0 1 -38 0 Z"/>
+    <path d="M508 372 L612 348 v104 Q566 428 508 448 Z"/>
   </g>
-  <!-- play badge on the spindle -->
-  <circle cx="512" cy="512" r="96" fill="#FF8616"/>
-  <circle cx="512" cy="512" r="96" fill="none" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="6"/>
-  <path d="M490 466 L566 512 L490 558 Z" fill="#FFFFFF"/>
+  <!-- note head holes keep the shape reading as a quaver at small sizes -->
+  <ellipse cx="438" cy="646" rx="20" ry="14" transform="rotate(-18 438 646)" fill="#1B1C22" fill-opacity="0.35"/>
+  <ellipse cx="600" cy="616" rx="20" ry="14" transform="rotate(-18 600 616)" fill="#1B1C22" fill-opacity="0.35"/>
 </g>
 </svg>

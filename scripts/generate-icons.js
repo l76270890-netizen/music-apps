@@ -42,58 +42,84 @@ const OUTPUTS = [
   { file: 'public/icons/tuneit-favicon-48.png', size: 48 },
 ];
 
-/* SVG fallback for the PWA — browsers without SVG support use the PNGs. */
+/* SVG fallback for the PWA — browsers without SVG support use the PNGs.
+ *
+ * Artwork: dark glossy tile with an orange rounded frame, an orange vinyl record
+ * behind a large orange music note, and orange equalizer bars on both sides.
+ * Orange-on-dark only, so it stays readable at 48px. */
 function svgMarkup({ maskable = false } = {}) {
-  // Artwork sits inside a 1024 box. For maskable icons the safe zone is the
-  // inner 80% circle, so the glyph is nudged slightly smaller.
-  const scale = maskable ? 0.78 : 1;
+  // Launcher masks crop to the inner circle, so the glyph is pulled in.
+  const scale = maskable ? 0.8 : 1;
   const mid = 512;
+
+  // Equalizer bars: [x, height], mirrored around the centre.
+  const BAR_W = 30;
+  const bars = [
+    [132, 86], [186, 128], [240, 96], [294, 150],   // left, growing toward the note
+    [700, 150], [754, 96], [808, 128], [862, 86],   // right, mirror image
+  ]
+    .map(([x, h]) => `<rect x="${x}" y="${512 - h / 2}" width="${BAR_W}" height="${h}" rx="15"/>`)
+    .join('');
+
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
 <defs>
-  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+  <linearGradient id="tile" x1="0" y1="0" x2="0.4" y2="1">
+    <stop offset="0" stop-color="#2B2C34"/>
+    <stop offset="0.55" stop-color="#1F2028"/>
+    <stop offset="1" stop-color="#14151B"/>
+  </linearGradient>
+  <linearGradient id="frame" x1="0" y1="0" x2="1" y2="1">
     <stop offset="0" stop-color="#FFA64D"/>
-    <stop offset="0.55" stop-color="#FF8616"/>
     <stop offset="1" stop-color="#FF6A00"/>
   </linearGradient>
-  <linearGradient id="swoosh" x1="0" y1="0" x2="1" y2="0">
-    <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.98"/>
-    <stop offset="1" stop-color="#FFFFFF" stop-opacity="0.85"/>
-  </linearGradient>
-  <radialGradient id="dish" cx="0.34" cy="0.28" r="0.85">
-    <stop offset="0" stop-color="#33353F"/>
-    <stop offset="1" stop-color="#17181F"/>
+  <radialGradient id="glow" cx="0.5" cy="0.5" r="0.55">
+    <stop offset="0" stop-color="#FF8616" stop-opacity="0.35"/>
+    <stop offset="1" stop-color="#FF8616" stop-opacity="0"/>
   </radialGradient>
+  <linearGradient id="orange" x1="0" y1="0" x2="0.5" y2="1">
+    <stop offset="0" stop-color="#FFA64D"/>
+    <stop offset="0.5" stop-color="#FF8616"/>
+    <stop offset="1" stop-color="#F06A00"/>
+  </linearGradient>
 </defs>
-<rect width="1024" height="1024" fill="url(#bg)"/>
+<rect width="1024" height="1024" fill="url(#tile)"/>
+<!-- glossy sheen sweeping the top-left corner -->
+<path d="M0 0 H1024 L0 620 Z" fill="#FFFFFF" fill-opacity="0.035"/>
+<rect width="1024" height="1024" fill="url(#glow)"/>
+<!-- orange rounded frame -->
+<rect x="26" y="26" width="972" height="972" rx="190" fill="none" stroke="url(#frame)" stroke-width="30"/>
 <g transform="translate(${mid} ${mid}) scale(${scale}) translate(${-mid} ${-mid})">
-  <!-- vinyl record: solid dark disc, faint grooves, glossy highlight -->
-  <circle cx="512" cy="512" r="324" fill="#0F1015" fill-opacity="0.22"/>
-  <circle cx="512" cy="512" r="300" fill="url(#dish)"/>
-  <circle cx="512" cy="512" r="300" fill="none" stroke="#FFFFFF" stroke-opacity="0.14" stroke-width="4"/>
-  <circle cx="512" cy="512" r="250" fill="none" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="3"/>
-  <path d="M300 350 A240 240 0 0 1 470 222" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="26" stroke-linecap="round"/>
-  <!-- equalizer bars, kept clear of the centre so the play badge stays legible -->
-  <g fill="url(#swoosh)">
-    <rect x="384" y="474" width="26" height="76" rx="13"/>
-    <rect x="440" y="436" width="26" height="152" rx="13"/>
-    <rect x="558" y="436" width="26" height="152" rx="13"/>
-    <rect x="614" y="474" width="26" height="76" rx="13"/>
+  <!-- vinyl record behind the note -->
+  <circle cx="512" cy="512" r="250" fill="url(#orange)" fill-opacity="0.16"/>
+  <circle cx="512" cy="512" r="250" fill="none" stroke="url(#orange)" stroke-opacity="0.55" stroke-width="6"/>
+  <circle cx="512" cy="512" r="206" fill="none" stroke="#FF8616" stroke-opacity="0.28" stroke-width="3"/>
+  <circle cx="512" cy="512" r="162" fill="none" stroke="#FF8616" stroke-opacity="0.2" stroke-width="3"/>
+  <!-- equalizer bars -->
+  <g fill="url(#orange)">${bars}</g>
+  <!-- music note: two heads, stem, and a slanted beam -->
+  <g fill="url(#orange)">
+    <ellipse cx="438" cy="646" rx="58" ry="44" transform="rotate(-18 438 646)"/>
+    <ellipse cx="600" cy="616" rx="58" ry="44" transform="rotate(-18 600 616)"/>
+    <path d="M470 372 h38 v282 a19 19 0 0 1 -38 0 Z"/>
+    <path d="M508 372 L612 348 v104 Q566 428 508 448 Z"/>
   </g>
-  <!-- play badge on the spindle -->
-  <circle cx="512" cy="512" r="96" fill="#FF8616"/>
-  <circle cx="512" cy="512" r="96" fill="none" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="6"/>
-  <path d="M490 466 L566 512 L490 558 Z" fill="#FFFFFF"/>
+  <!-- note head holes keep the shape reading as a quaver at small sizes -->
+  <ellipse cx="438" cy="646" rx="20" ry="14" transform="rotate(-18 438 646)" fill="#1B1C22" fill-opacity="0.35"/>
+  <ellipse cx="600" cy="616" rx="20" ry="14" transform="rotate(-18 600 616)" fill="#1B1C22" fill-opacity="0.35"/>
 </g>
 </svg>
 `;
 }
 
-/* Adaptive foreground: glyph only, no orange background plate (the colour comes
- * from the <background> layer), otherwise you get an orange square on orange. */
+/* Adaptive foreground: the note and bars only, on transparency — the dark tile
+ * and frame come from the icon itself, and the colour under it is set by the
+ * <background> layer, so the glyph must not bring its own plate. */
 function adaptiveForegroundSvg() {
   return svgMarkup({ maskable: true })
-    .replace('<rect width="1024" height="1024" fill="url(#bg)"/>', '')
-    .replace(/<circle cx="512" cy="512" r="324" fill="#0F1015" fill-opacity="0.22"\/>/, '');
+    .replace('<rect width="1024" height="1024" fill="url(#tile)"/>', '')
+    .replace('<path d="M0 0 H1024 L0 620 Z" fill="#FFFFFF" fill-opacity="0.035"/>', '')
+    .replace('<rect width="1024" height="1024" fill="url(#glow)"/>', '')
+    .replace(/<rect x="26" y="26"[^>]*\/>/, '');
 }
 
 function svgMaskable() {

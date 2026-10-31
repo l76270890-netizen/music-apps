@@ -14,8 +14,10 @@ export default function Root({ children }) {
         <meta name="apple-mobile-web-app-title" content="TuneIt" />
         <meta name="description" content="Your music, your way. Listen to your favorite songs offline with TuneIt." />
         <link rel="manifest" href="/manifest.json" />
-        <link rel="icon" href="/icons/tuneit-192.png" />
-        <link rel="apple-touch-icon" href="/icons/tuneit-192.png" />
+        <link rel="icon" type="image/png" sizes="48x48" href="/icons/tuneit-favicon-48.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icons/tuneit-192.png" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/icons/tuneit-512.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/tuneit-apple-180.png" />
         <title>TuneIt - Offline Music Player</title>
         <style>{'html,body{background:#17171F;margin:0;padding:0;}'}</style>
       </head>
